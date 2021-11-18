@@ -35,9 +35,16 @@ dans le docker-compose pour simuler une verison version de mysql aussi.
 [Astuce pour le HTTPS]
 
 Pour le https (utilistation de proxy sur les deux vshots 80 et 443)
+
+```
 SSLEngine on
 ProxyPass / http://localhost:6969/
 ProxyPassReverse / http://localhost:6969/
 ProxyPreserveHost On <- *** Important sinon redirections à la con ***
-et dans le wp-config.php on force avec $_SERVER['HTTPS'] = 'on';
+```
+
+et dans le `wp-config.php` on force avec
+```php
+$_SERVER['HTTPS'] = 'on';
+```
 
