@@ -1,0 +1,25 @@
+/.buildpath
+/.project
+/.settings
+
+/.env
+
+# Ignore Docker Compose overriding YAML files:
+/docker-compose.override.yml
+/docker-compose.override-*.yml
+# But we want to keep the example file "docker-compose.override-example.yml":
+!/docker-compose.override-example.yml
+
+# Ignore configuration files:
+/Docker/webappserver/php-configurations/*-local.ini
+# But we want to keep the example files "*.ini.example":
+!/Docker/webappserver/php-configurations/*.ini.example
+
+
+# Vendor libraries
+vendor/**
+
+!**/.gitkeep
+/composer.lock
+/README.md~
+/test.sql~
