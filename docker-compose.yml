@@ -1,0 +1,67 @@
+version: "3.7"
+
+x-logging:
+    &default-logging
+    driver: json-file
+    options:
+        max-file: "7"
+        max-size: "50m"
+
+services:
+
+    sql-database:
+        image: mariadb:10.3.22
+        volumes:
+            -
+                type: volume
+                source: sql-data
+                target: /var/lib/mysql
+                volume:
+                    nocopy: true
+            -
+                type: bind
+                source: ./Docker/sql-database/init-dataset
+                target: /docker-entrypoint-initdb.d
+                read_only: true
+            -
+                type: bind
+                source: ./mcd
+                target: /datasets
+                read_only: true
+        environment:
+            - MYSQL_ROOT_PASSWORD=${SQLDATABASE_ROOT_PASSWORD}
+            - SQLDATABASE_DBNAME=${SQLDATABASE_DBNAME}
+        logging: *default-logging
+        networks:
+            - app_net
+        restart: unless-stopped
+        command: --sql_mode="" --max_connections=151
+
+    webappserver:
+        build:
+            args:
+                - SATIS_REPOSITORY_LOGIN=${SATIS_REPOSITORY_LOGIN}
+                - SATIS_REPOSITORY_PASSWORD=${SATIS_REPOSITORY_PASSWORD}
+                - PHP_INI_BASE_FILE=${WEBAPPSERVER_PHP_INI}
+            context: .
+            dockerfile: ./Docker/webappserver.Dockerfile
+        logging: *default-logging
+        networks:
+            - app_net
+        depends_on:
+            - sql-database
+        restart: unless-stopped
+
+
+networks:
+    app_net:
+        driver: bridge
+        ipam:
+            config:
+                # Defining via environment variable is easier than overriding via other YAML file
+                - subnet: ${COMPOSE_NETWORK_SUBNET}
+            driver: default
+
+
+volumes:
+    sql-data:
